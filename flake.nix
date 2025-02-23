@@ -18,6 +18,8 @@
                 devShells.default = pkgs.mkShell {
                     packages = with pkgs; [
                         cmake
+                        python3
+                        uv
                         zizmor
                     ];
                 };

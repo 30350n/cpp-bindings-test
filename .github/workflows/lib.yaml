@@ -1,0 +1,43 @@
+name: Build Dynamic Library
+on:
+  push:
+  release:
+    types: [published]
+jobs:
+  build_lib:
+    name: Build dynamic library on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@v27
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build library
+        run: |
+          nix build
+          ls -lR result/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}
+          path: ./result/lib/*
+  build_lib_windows:
+    name: Build dynamic library on windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build library
+        run: |
+          cmake -B result -G "Visual Studio 17 2022"
+          cmake --build result --config Release
+          cmake --build result --config Release -t RUN_TESTS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: ./result/Release/*.dll

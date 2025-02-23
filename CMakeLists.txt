@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(cpp-bindings-test)
 set(CMAKE_CXX_VERSION 20)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 add_library(cpp-bindings-test SHARED
     src/main.cpp

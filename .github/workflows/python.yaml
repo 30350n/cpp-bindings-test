@@ -1,0 +1,37 @@
+name: Build Python Bindings
+on:
+  push:
+  release:
+    types: [published]
+jobs:
+  build_wheel:
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-latest]
+    defaults:
+      run:
+        working-directory: ./bindings/python
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: bindings/python/pyproject.toml
+      - name: Install CI build dependencies
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ env.pythonLocation }}
+        run: uv sync --only-group ci
+      - name: Build wheel
+        working-directory: .
+        run: cibuildwheel bindings/python --output-dir bindings/python/wheelhouse
+      - name: Fix wheel tags
+        shell: bash
+        run: wheel tags wheelhouse/*.whl --remove --python-tag cp3 --abi-tag none
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: bindings/python/wheelhouse/*.whl

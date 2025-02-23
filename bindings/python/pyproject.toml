@@ -1,0 +1,20 @@
+[project]
+name = "cpp_bindings_test"
+version = "0.1"
+requires-python = ">=3.9"
+
+[dependency-groups]
+dev = ["setuptools", "setuptools_scm<8", "cmake-build-extension==0.6.1", "ruff"]
+ci = ["cibuildwheel", "wheel"]
+
+[build-system]
+requires = ["setuptools", "setuptools_scm<8", "cmake_build_extension==0.6.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+build = "cp39-*"
+skip = ["pp*", "*_i686", "*-win32"]
+build-frontend = "build[uv]"
+
+[tool.ruff]
+line-length = 100

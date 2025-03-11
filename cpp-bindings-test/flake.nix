@@ -15,14 +15,6 @@
             ];
             perSystem = {pkgs, ...}: {
                 packages.default = pkgs.callPackage ./package.nix {};
-                devShells.default = pkgs.mkShell {
-                    packages = with pkgs; [
-                        cmake
-                        python3
-                        uv
-                        zizmor
-                    ];
-                };
             };
         };
 }

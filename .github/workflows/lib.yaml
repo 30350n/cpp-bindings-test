@@ -10,6 +10,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-latest]
+    defaults:
+      run:
+        working-directory: cpp-bindings-test/
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,10 +27,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}
-          path: ./result/lib/*
+          path: cpp-bindings-test/result/lib/*
   build_lib_windows:
     name: Build dynamic library on windows
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: cpp-bindings-test/
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,4 +46,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: ./result/Release/*.dll
+          path: cpp-bindings-test/result/Release/*.dll

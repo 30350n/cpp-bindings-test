@@ -4,11 +4,11 @@ version = "0.1"
 requires-python = ">=3.9"
 
 [dependency-groups]
-dev = ["setuptools", "setuptools_scm<8", "cmake-build-extension==0.6.1", "ruff"]
+dev = ["setuptools", "setuptools-scm==8.2.0", "cmake-build-extension", "ruff"]
 ci = ["cibuildwheel", "wheel"]
 
 [build-system]
-requires = ["setuptools", "setuptools_scm<8", "cmake_build_extension==0.6.1"]
+requires = ["setuptools", "setuptools-scm==8.2.0", "cmake-build-extension"]
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
@@ -16,5 +16,14 @@ build = "cp39-*"
 skip = ["pp*", "*_i686", "*-win32"]
 build-frontend = "build[uv]"
 
+[tool.distutils.egg_info]
+egg_base = "."
+
 [tool.ruff]
 line-length = 100
+
+[tool.setuptools_scm]
+root = "../.."
+
+[tool.uv.sources]
+cmake-build-extension = { git = "https://github.com/30350n/cmake-build-extension", branch = "patch-1" }

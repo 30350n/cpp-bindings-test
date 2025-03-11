@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 
-from cmake_build_extension import BuildExtension, CMakeExtension, GitSdistFolder
+from cmake_build_extension import BuildExtension, CMakeExtension, GitSdistTree
 from setuptools import setup
 
-CMAKE_DIRECTORY = Path(__file__).parents[2].absolute()
+CMAKE_DIRECTORY = Path(__file__).parents[2].absolute() / "cpp-bindings-test"
 
 cmake_options = []
 if os.environ.get("CI"):
@@ -20,7 +20,7 @@ setup(
         ),
     ],
     cmdclass={
-        "sdist": GitSdistFolder,
+        "sdist": GitSdistTree,
         "build_ext": BuildExtension,
     },
 )

@@ -11,6 +11,7 @@ stdenv.mkDerivation {
         "^src.*"
         "^test.*"
         "CMakeLists.txt"
+        ".*\.pc\.in"
     ];
     nativeBuildInputs = [cmake];
 

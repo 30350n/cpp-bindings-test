@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-project(cpp-bindings-test)
+
+project(cpp-bindings-test
+    DESCRIPTION "cpp-bindings-test description"
+    HOMEPAGE_URL https://github.com/30350n/cpp-bindings-test
+    VERSION 0.1.0
+)
+
 set(CMAKE_CXX_VERSION 20)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
@@ -9,10 +15,14 @@ add_library(cpp-bindings-test SHARED
 set_target_properties(cpp-bindings-test PROPERTIES PUBLIC_HEADER
     include/cpp-bindings-test.h
 )
+configure_file(cpp-bindings-test.pc.in cpp-bindings-test.pc @ONLY)
 
 install(TARGETS cpp-bindings-test
     LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include
+)
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/cpp-bindings-test.pc DESTINATION lib/pkgconfig
 )
 
 option(TESTING "Enable tests." ON)

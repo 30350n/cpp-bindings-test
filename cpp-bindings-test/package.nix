@@ -7,6 +7,7 @@
 stdenv.mkDerivation {
     name = "cpp-bindings-test";
     src = lib.sourceByRegex ./. [
+        "^include.*"
         "^src.*"
         "^test.*"
         "CMakeLists.txt"

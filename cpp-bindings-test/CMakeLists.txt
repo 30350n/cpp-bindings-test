@@ -6,8 +6,14 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 add_library(cpp-bindings-test SHARED
     src/main.cpp
 )
+set_target_properties(cpp-bindings-test PROPERTIES PUBLIC_HEADER
+    include/cpp-bindings-test.h
+)
 
-install(TARGETS cpp-bindings-test DESTINATION lib)
+install(TARGETS cpp-bindings-test
+    LIBRARY DESTINATION lib
+    PUBLIC_HEADER DESTINATION include
+)
 
 option(TESTING "Enable tests." ON)
 if (TESTING)

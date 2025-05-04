@@ -1,7 +1,9 @@
 {
     lib,
     stdenv,
+    clang,
     cmake,
+    musl,
     enableTests ? true,
 }:
 stdenv.mkDerivation {
@@ -13,7 +15,7 @@ stdenv.mkDerivation {
         "CMakeLists\.txt"
         ".*\.pc\.in"
     ];
-    nativeBuildInputs = [cmake];
+    nativeBuildInputs = [clang cmake musl];
 
     doCheck = true;
     cmakeFlags = lib.optional (!enableTests) "-DTESTING=off";

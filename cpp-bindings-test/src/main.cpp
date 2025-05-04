@@ -1,7 +1,8 @@
-#include <iostream>
+#include <stdio.h>
 
 extern "C" int hello(int num)
 {
-    std::cout << "Hello " << num << std::endl;
+    printf("Hello %d\n", num);
+    fflush(stdout);
     return 0;
 }

@@ -40,10 +40,10 @@ jobs:
           persist-credentials: false
       - name: Build library
         run: |
-          cmake -B result -G "Visual Studio 17 2022"
-          cmake --build result --config Release
-          cmake --build result --config Release -t RUN_TESTS
+          cmake -B build -G "Visual Studio 17 2022"
+          cmake --build build --config Release
+          cmake --build build --config Release -t RUN_TESTS
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: cpp-bindings-test/result/Release/*.dll
+          path: cpp-bindings-test/build/Release/*.dll

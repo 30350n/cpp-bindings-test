@@ -1,5 +1,2 @@
+cpp-bindings-test/lib/
 dist/
-
-*.so
-*.dll
-*.dylib

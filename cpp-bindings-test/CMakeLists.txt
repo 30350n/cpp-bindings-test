@@ -19,14 +19,11 @@ endif()
 add_library(cpp-bindings-test SHARED
     src/main.cpp
 )
+target_link_options(cpp-bindings-test PRIVATE -static)
 set_target_properties(cpp-bindings-test PROPERTIES PUBLIC_HEADER
     include/cpp-bindings-test.h
 )
 configure_file(cpp-bindings-test.pc.in cpp-bindings-test.pc @ONLY)
-
-if (has_musl_clang)
-    target_link_options(cpp-bindings-test PRIVATE -static-libgcc -static-libstdc++ -static)
-endif()
 
 install(TARGETS cpp-bindings-test
     LIBRARY DESTINATION lib

@@ -49,8 +49,15 @@ jobs:
           name: lib-${{ matrix.os }}
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: bindings/python/lib
-      - run: ls -la bindings/python/lib
+          path: bindings/python/artifacts
+      - name: Copy prebuilt-library into source tree
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" != "Windows" ]; then
+            cp -r artifacts/lib cpp-bindings-test/lib
+          else
+            cp -r artifacts/bin cpp-bindings-test/lib
+          fi
       - name: Build wheel
         run: uv build --wheel
       - uses: actions/upload-artifact@v4

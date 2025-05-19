@@ -1,7 +1,5 @@
-build/
 dist/
-wheelhouse/
-*.egg-info/
 
 *.so
 *.dll
+*.dylib

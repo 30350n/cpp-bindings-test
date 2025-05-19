@@ -26,7 +26,7 @@ jobs:
           ls -lR result/
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}
+          name: lib-${{ matrix.os }}
           path: cpp-bindings-test/result/lib/*
   build_lib_windows:
     name: Build dynamic library on windows
@@ -45,5 +45,5 @@ jobs:
           cmake --build build --config Release -t RUN_TESTS
       - uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: lib-windows-latest
           path: cpp-bindings-test/build/Release/*.dll

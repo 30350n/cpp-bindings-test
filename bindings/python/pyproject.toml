@@ -1,29 +1,23 @@
 [project]
-name = "cpp_bindings_test"
+name = "cpp-bindings-test"
 version = "0.1"
 requires-python = ">=3.9"
 
 [dependency-groups]
-dev = ["setuptools", "setuptools-scm==8.2.0", "cmake-build-extension", "ruff"]
-ci = ["cibuildwheel", "wheel"]
+dev = ["hatchling", "ruff"]
 
 [build-system]
-requires = ["setuptools", "setuptools-scm==8.2.0", "cmake-build-extension"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.cibuildwheel]
-build = "cp39-*"
-skip = ["pp*", "*_i686", "*-win32"]
-build-frontend = "build[uv]"
-
-[tool.distutils.egg_info]
-egg_base = "."
+[tool.hatch.build]
+packages = ["cpp-bindings-test"]
+[tool.hatch.build.targets.sdist.force-include]
+"../../cpp-bindings-test/CMakeLists.txt" = "lib-cpp-bindings-test/CMakeLists.txt"
+"../../cpp-bindings-test/src" = "lib-cpp-bindings-test/src"
+[tool.hatch.build.targets.wheel]
+artifacts = ["*/lib/*.so", "*/lib/*.dll", "*/lib/*.dylib"]
+[tool.hatch.build.targets.wheel.hooks.custom]
 
 [tool.ruff]
 line-length = 100
-
-[tool.setuptools_scm]
-root = "../.."
-
-[tool.uv.sources]
-cmake-build-extension = { git = "https://github.com/30350n/cmake-build-extension", branch = "patch-1" }

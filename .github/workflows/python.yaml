@@ -1,12 +1,14 @@
 name: Build Python Bindings
+run-name: Build Python Bindings (${{ github.sha }})
 on:
-  push:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Build Dynamic Library"]
+    types: [completed]
 jobs:
   build_sdist:
     name: Build python sdist
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
     defaults:
       run:
         working-directory: bindings/python
@@ -26,8 +28,8 @@ jobs:
           path: bindings/python/dist/*.tar.gz
   build_wheel:
     name: Build python wheel on ${{ matrix.os }}
-    needs: build_lib
     runs-on: ${{ matrix.os }}
+    if: github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest] # , ubuntu-24.04-arm, macos-13, macos-latest
@@ -45,6 +47,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: lib-${{ matrix.os }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: bindings/python/lib
       - run: ls -la bindings/python/lib
       - name: Build wheel

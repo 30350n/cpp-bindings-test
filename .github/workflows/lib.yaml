@@ -1,4 +1,5 @@
 name: Build Dynamic Library
+run-name: Build Dynamic Library (${{ github.sha }})
 on:
   push:
   release:

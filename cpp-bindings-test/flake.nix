@@ -20,6 +20,7 @@
             }: {
                 packages.default = pkgs.callPackage ./package.nix {
                     useMusl = system == "x86_64-linux";
+                    useGlibcCompat = system == "aarch64-linux";
                 };
             };
         };

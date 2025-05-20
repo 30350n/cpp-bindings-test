@@ -19,7 +19,12 @@ endif()
 add_library(cpp-bindings-test SHARED
     src/main.cpp
 )
-target_link_options(cpp-bindings-test PRIVATE -static)
+if (has_musl_clang)
+    target_link_options(cpp-bindings-test PRIVATE -static)
+elseif (DEFINED ENV{GLIBC_COMPAT_HEADER})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include $ENV{GLIBC_COMPAT_HEADER}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include $ENV{GLIBC_COMPAT_HEADER}")
+endif()
 set_target_properties(cpp-bindings-test PROPERTIES PUBLIC_HEADER
     include/cpp-bindings-test.h
 )

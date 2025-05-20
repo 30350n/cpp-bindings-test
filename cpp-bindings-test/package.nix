@@ -1,10 +1,12 @@
 {
     lib,
     stdenv,
+    callPackage,
     clang,
     cmake,
     musl,
     enableTests ? true,
+    useMusl ? true,
 }:
 stdenv.mkDerivation {
     name = "cpp-bindings-test";
@@ -15,7 +17,12 @@ stdenv.mkDerivation {
         "CMakeLists\.txt"
         ".*\.pc\.in"
     ];
-    nativeBuildInputs = [clang cmake musl];
+    nativeBuildInputs = [clang cmake] ++ lib.optionals useMusl [musl];
+
+    GLIBC_COMPAT_HEADER = let
+        glibc-compat-header = callPackage ./glibc-compat-header.nix {};
+    in
+        lib.optional (!useMusl) "${glibc-compat-header}/include/glibc-compat.h";
 
     doCheck = true;
     cmakeFlags = lib.optional (!enableTests) "-DTESTING=off";

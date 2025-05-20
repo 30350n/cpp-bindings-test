@@ -13,8 +13,14 @@
                 "x86_64-darwin"
                 "aarch64-darwin"
             ];
-            perSystem = {pkgs, ...}: {
-                packages.default = pkgs.callPackage ./package.nix {};
+            perSystem = {
+                pkgs,
+                system,
+                ...
+            }: {
+                packages.default = pkgs.callPackage ./package.nix {
+                    useMusl = system == "x86_64-linux";
+                };
             };
         };
 }

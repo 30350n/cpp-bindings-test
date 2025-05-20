@@ -24,7 +24,9 @@ assert !(useMusl && useGlibcCompat);
         GLIBC_COMPAT_HEADER = let
             glibc-compat-header = callPackage ./glibc-compat-header.nix {};
         in
-            lib.optional useGlibcCompat "${glibc-compat-header}/include/glibc-compat.h";
+            if useGlibcCompat
+            then "${glibc-compat-header}/include/glibc-compat.h"
+            else null;
 
         doCheck = true;
         cmakeFlags = lib.optional (!enableTests) "-DTESTING=off";

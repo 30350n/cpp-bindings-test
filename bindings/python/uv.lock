@@ -2,12 +2,26 @@ version = 1
 requires-python = ">=3.9"
 
 [[package]]
+name = "auditwheel"
+version = "6.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pyelftools" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fb/f3/b61e3b5ccceee2c25baff6c16146d031f6f5c75b1c09d598bfbfe498adec/auditwheel-6.4.0.tar.gz", hash = "sha256:20990ccb2416fdb81983ef654d10df72f9f25b388e30105bc3d97b06d6aecafb", size = 5120983 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/56/8f4ebf2e90c093530859cfb4f5f7ee3b13521248c092b76f220286dce385/auditwheel-6.4.0-py3-none-any.whl", hash = "sha256:c97d286ecd8c43c998ca7c312d3ba1773327349f732faf2a77b8b9fea4f48696", size = 50754 },
+]
+
+[[package]]
 name = "cpp-bindings-test"
 version = "0.1"
 source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
+    { name = "auditwheel" },
     { name = "hatchling" },
     { name = "ruff" },
 ]
@@ -16,6 +30,7 @@ dev = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "auditwheel" },
     { name = "hatchling" },
     { name = "ruff" },
 ]
@@ -61,6 +76,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538 },
+]
+
+[[package]]
+name = "pyelftools"
+version = "0.32"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/ab/33968940b2deb3d92f5b146bc6d4009a5f95d1d06c148ea2f9ee965071af/pyelftools-0.32.tar.gz", hash = "sha256:6de90ee7b8263e740c8715a925382d4099b354f29ac48ea40d840cf7aa14ace5", size = 15047199 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/af/43/700932c4f0638c3421177144a2e86448c0d75dbaee2c7936bda3f9fd0878/pyelftools-0.32-py3-none-any.whl", hash = "sha256:013df952a006db5e138b1edf6d8a68ecc50630adbd0d83a2d41e7f846163d738", size = 188525 },
 ]
 
 [[package]]

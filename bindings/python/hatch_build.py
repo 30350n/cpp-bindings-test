@@ -4,7 +4,11 @@ import shutil
 import subprocess
 from itertools import chain
 from pathlib import Path
+from sysconfig import get_platform
+from tempfile import gettempdir
+from zipfile import ZipFile
 
+from auditwheel.wheel_abi import analyze_wheel_abi
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
 PARENT_DIR = Path(__file__).parent
@@ -42,7 +46,22 @@ class CustomBuildHook(BuildHookInterface):
                 ["cmake", "--build", out_dir.name, "--config", "Release"], cwd=source_dir
             )
 
-        for path in chain(*(out_dir.glob(f"*.{ext}") for ext in ["so", "dll", "dylib"])):
-            if (target_path := target_dir / path.name).is_file():
+        lib_paths = list(chain(*(out_dir.glob(f"*.{ext}") for ext in ["so", "dll", "dylib"])))
+        for lib_path in lib_paths:
+            if (target_path := target_dir / lib_path.name).is_file():
                 target_path.unlink()
-            shutil.copy(path, target_path)
+            shutil.copy(lib_path, target_path)
+
+        dummy_wheel_path = Path(gettempdir()) / "dummy.whl"
+        with ZipFile(dummy_wheel_path, "w", strict_timestamps=False) as zip_file:
+            records_str = ""
+            for lib_path in lib_paths:
+                zip_file.write(lib_path, lib_path.name)
+                records_str += f"{lib_path.name},,\n"
+            zip_file.writestr("dummy.dist-info/RECORD", records_str)
+        wheel_info = analyze_wheel_abi(None, None, dummy_wheel_path, frozenset(), False, False)
+
+        platform_tag = get_platform().replace("-", "_").replace(".", "_")
+        if wheel_info.external_refs[wheel_info.policies.lowest.name].libs:
+            platform_tag = f"{wheel_info.overall_policy.name}_{platform_tag}"
+        build_data["tag"] = f"py3-none-{platform_tag}"

@@ -4,10 +4,10 @@ version = "0.1"
 requires-python = ">=3.9"
 
 [dependency-groups]
-dev = ["hatchling", "ruff"]
+dev = ["hatchling", "auditwheel", "ruff"]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "auditwheel"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]

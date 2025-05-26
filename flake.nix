@@ -17,11 +17,18 @@
                 pkgs,
                 system,
                 ...
-            }: {
-                packages.default = pkgs.callPackage ./package.nix {
+            }: rec {
+                packages.default = packages.cpp-bindings-test;
+                packages.cpp-bindings-test = pkgs.callPackage ./cpp-bindings-test/package.nix {
                     useMusl = system == "x86_64-linux";
                     useGlibcCompat = system == "aarch64-linux";
                 };
+
+                devShells.default = devShells.cpp-bindings-test;
+                devShells.cpp-bindings-test = pkgs.mkShell {
+                    nativeBuildInputs = packages.default.nativeBuildInputs;
+                };
+                devShells.python = import ./bindings/python/shell.nix {inherit pkgs;};
             };
         };
 }

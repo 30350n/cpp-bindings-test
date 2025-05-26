@@ -58,6 +58,11 @@ jobs:
           else
             cp -r artifacts/bin cpp-bindings-test/lib
           fi
+      - run: |
+          python -c "import os; print(os.environ.get('_PYTHON_HOST_PLATFORM'))"
+          python -c "import platform; print(platform.mac_ver())"
+          python -c "import sysconfig; print(sysconfig.get_platform())"
+      - run: python -c "import os, _osx_support, sysconfig; print(sysconfig.get_config_vars(), '\n', os.uname(), '\n', _osx_support.get_platform_osx(sysconfig.get_config_vars(), os.uname()[0], os.uname()[2], os.uname()[4]))"
       - name: Build wheel
         run: uv build --wheel
       - uses: actions/upload-artifact@v4

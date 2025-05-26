@@ -14,20 +14,24 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 PARENT_DIR = Path(__file__).parent
 SOURCE_DIR = PARENT_DIR.parents[1] / "cpp-bindings-test"
 SDIST_SOURCE_DIR = PARENT_DIR / "lib-cpp-bindings-test"
+TARGET_DIR = PARENT_DIR / "cpp-bindings-test" / "lib"
+
+LIBRARY_EXTENSIONS = ["so", "dll", "dylib"]
 
 
 class CustomBuildHook(BuildHookInterface):
     def initialize(self, version, build_data):
+        if not os.environ.get("CI"):
+            print(f"building '{SOURCE_DIR.name}' library ...")
+            self.build_library()
+
+        build_data["tag"] = f"py3-none-{self.get_platform_tag()}"
+
+    def build_library(self):
         is_sdist_build = SDIST_SOURCE_DIR.is_dir()
         source_dir = SDIST_SOURCE_DIR if is_sdist_build else SOURCE_DIR
 
-        if os.environ.get("CI"):
-            return
-
-        print(f"building '{SOURCE_DIR.name}' library ...")
-
-        target_dir = PARENT_DIR / "cpp-bindings-test" / "lib"
-        target_dir.mkdir(exist_ok=True)
+        TARGET_DIR.mkdir(exist_ok=True)
 
         if shutil.which("nix") and not is_sdist_build:
             subprocess.run(["nix", "build"], cwd=source_dir)
@@ -46,22 +50,25 @@ class CustomBuildHook(BuildHookInterface):
                 ["cmake", "--build", out_dir.name, "--config", "Release"], cwd=source_dir
             )
 
-        lib_paths = list(chain(*(out_dir.glob(f"*.{ext}") for ext in ["so", "dll", "dylib"])))
-        for lib_path in lib_paths:
-            if (target_path := target_dir / lib_path.name).is_file():
+        for path in chain(*(out_dir.glob(f"*.{ext}") for ext in LIBRARY_EXTENSIONS)):
+            if (target_path := TARGET_DIR / path.name).is_file():
                 target_path.unlink()
-            shutil.copy(lib_path, target_path)
+            shutil.copy(path, target_path)
 
-        dummy_wheel_path = Path(gettempdir()) / "dummy.whl"
-        with ZipFile(dummy_wheel_path, "w", strict_timestamps=False) as zip_file:
-            records_str = ""
-            for lib_path in lib_paths:
-                zip_file.write(lib_path, lib_path.name)
-                records_str += f"{lib_path.name},,\n"
-            zip_file.writestr("dummy.dist-info/RECORD", records_str)
-        wheel_info = analyze_wheel_abi(None, None, dummy_wheel_path, frozenset(), False, False)
-
+    def get_platform_tag(self):
         platform_tag = get_platform().replace("-", "_").replace(".", "_")
-        if wheel_info.external_refs[wheel_info.policies.lowest.name].libs:
-            platform_tag = f"{wheel_info.overall_policy.name}_{platform_tag}"
-        build_data["tag"] = f"py3-none-{platform_tag}"
+
+        if platform.system() == "Linux":
+            dummy_wheel_path = Path(gettempdir()) / "dummy.whl"
+            with ZipFile(dummy_wheel_path, "w", strict_timestamps=False) as zip_file:
+                records_str = ""
+                for lib_path in chain(*(TARGET_DIR.glob(f"*.{ext}") for ext in LIBRARY_EXTENSIONS)):
+                    zip_file.write(lib_path, lib_path.name)
+                    records_str += f"{lib_path.name},,\n"
+                zip_file.writestr("dummy.dist-info/RECORD", records_str)
+            wheel_info = analyze_wheel_abi(None, None, dummy_wheel_path, frozenset(), False, False)
+
+            if wheel_info.external_refs[wheel_info.policies.lowest.name].libs:
+                platform_tag = f"{wheel_info.overall_policy.name}_{platform_tag}"
+
+        return platform_tag

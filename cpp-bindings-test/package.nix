@@ -2,15 +2,13 @@
     lib,
     stdenv,
     callPackage,
-    clang,
     cmake,
-    musl,
     enableTests ? true,
-    useMusl ? false,
-    useGlibcCompat ? false,
-}:
-assert !(useMusl && useGlibcCompat);
-    stdenv.mkDerivation {
+    compat ? false,
+}: let
+    libc-compat = callPackage ./libc-compat.nix {};
+in
+    stdenv.mkDerivation rec {
         name = "cpp-bindings-test";
         src = lib.sourceByRegex ./. [
             "^include.*"
@@ -19,15 +17,23 @@ assert !(useMusl && useGlibcCompat);
             "CMakeLists\.txt"
             ".*\.pc\.in"
         ];
-        nativeBuildInputs = [clang cmake] ++ lib.optionals useMusl [musl];
+        nativeBuildInputs = [cmake];
 
-        GLIBC_COMPAT_HEADER = let
-            glibc-compat-header = callPackage ./glibc-compat-header.nix {};
-        in
-            if useGlibcCompat
-            then "${glibc-compat-header}/include/glibc-compat.h"
+        COMPAT_HEADERS =
+            if compat
+            then "${libc-compat.libc-compat-header}/include/glibc-compat.h"
+            else null;
+        COMPAT_LIBS =
+            if compat
+            then "${libc-compat.libc}/lib;${libc-compat.libcpp}/lib"
             else null;
 
         doCheck = true;
-        cmakeFlags = lib.optional (!enableTests) "-DTESTING=off";
+        cmakeFlags = lib.intersperse " " (
+            lib.optionals compat [
+                "-DCOMPAT_HEADERS=${COMPAT_HEADERS}"
+                "-DCOMPAT_LIBS=${COMPAT_LIBS}"
+            ]
+            ++ lib.optionals (!enableTests) ["-DTESTING=off"]
+        );
     }

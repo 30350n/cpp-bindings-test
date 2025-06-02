@@ -15,19 +15,18 @@
             ];
             perSystem = {
                 pkgs,
-                system,
+                lib,
                 ...
             }: rec {
                 packages.default = packages.cpp-bindings-test;
-                packages.cpp-bindings-test = pkgs.callPackage ./cpp-bindings-test/package.nix {
-                    useMusl = system == "x86_64-linux";
-                    useGlibcCompat = system == "aarch64-linux";
+                packages.cpp-bindings-test = pkgs.callPackage ./cpp-bindings-test/package.nix {};
+                packages.cpp-bindings-test-compat = pkgs.callPackage ./cpp-bindings-test/package.nix {
+                    compat = true;
                 };
 
                 devShells.default = devShells.cpp-bindings-test;
-                devShells.cpp-bindings-test = pkgs.mkShell {
-                    nativeBuildInputs = packages.default.nativeBuildInputs;
-                };
+                devShells.cpp-bindings-test = pkgs.mkShell {} // packages.cpp-bindings-test // {};
+                devShells.cpp-bindings-test-compat = pkgs.mkShell {} // packages.cpp-bindings-test-compat // {};
                 devShells.python = import ./bindings/python/shell.nix {inherit pkgs;};
             };
         };

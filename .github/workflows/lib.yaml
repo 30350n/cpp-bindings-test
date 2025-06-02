@@ -23,7 +23,7 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build library
         run: |
-          nix build
+          nix build .#cpp-bindings-test-compat
           ls -lR result/
       - uses: actions/upload-artifact@v4
         with:

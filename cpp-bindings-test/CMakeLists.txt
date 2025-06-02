@@ -9,22 +9,25 @@ project(cpp-bindings-test
 set(CMAKE_CXX_VERSION 20)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-find_program(has_musl_clang musl-clang)
-
-if (has_musl_clang)
-    set(CMAKE_CXX_COMPILER musl-clang)
-    set(CMAKE_CXX_COMPILER musl-clang)
-endif()
-
 add_library(cpp-bindings-test SHARED
     src/main.cpp
 )
-if (has_musl_clang)
-    target_link_options(cpp-bindings-test PRIVATE -static)
-elseif (DEFINED ENV{GLIBC_COMPAT_HEADER})
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include $ENV{GLIBC_COMPAT_HEADER}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include $ENV{GLIBC_COMPAT_HEADER}")
+
+option(COMPAT_HEADERS "Headers for compatibility with old libc versions" "")
+if (COMPAT_HEADERS)
+    foreach (header IN LISTS COMPAT_HEADERS)
+        target_include_directories(cpp-bindings-test PRIVATE -include ${header})
+    endforeach()
 endif()
+
+option(COMPAT_LIBS "Library paths for compatibility with old libc versions" "")
+if (COMPAT_LIBS)
+target_link_options(cpp-bindings-test PRIVATE -static-libgcc -static-libstdc++)
+    foreach (lib IN LISTS COMPAT_LIBS)
+        target_link_options(cpp-bindings-test PRIVATE -L${lib})
+    endforeach()
+endif()
+
 set_target_properties(cpp-bindings-test PROPERTIES PUBLIC_HEADER
     include/cpp-bindings-test.h
 )

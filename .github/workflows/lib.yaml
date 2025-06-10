@@ -18,9 +18,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: cachix/install-nix-action@v31
+      - uses: nixbuild/nix-quick-install-action@v30
         with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          nix_conf: keep-outputs = true
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ matrix.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ matrix.os }}-
+          purge: true
+          purge-prefixes: nix-${{ matrix.os }}-
+          purge-created: 0
+          purge-last-accessed: 0
+          purge-primary-key: never
       - name: Build library
         run: |
           nix build .#cpp-bindings-test-compat
